@@ -35,7 +35,7 @@ https://www.udemy.com/course/graphql-by-example/
         .then(({url}) => console.log(`Server running at ${url}`));  
       ```
   5. Test request with playground.
-
+![playground](https://user-images.githubusercontent.com/725743/104221625-6c35ba80-5441-11eb-9629-888044e6849b.png)
 
 * __Create client__
   1. Create `index.html`
