@@ -6,7 +6,7 @@ Learn GraphQL by writing full-stack JavaScript applications with Node.js, Expres
 https://www.udemy.com/course/graphql-by-example/
 
 ## Hello world
-* __Create server__
+### Create server
   1. Create project
   2. Add `package.json` file to root.
   3. Add dependences  
@@ -37,7 +37,7 @@ https://www.udemy.com/course/graphql-by-example/
   5. Test request with playground.
 ![playground](https://user-images.githubusercontent.com/725743/104221625-6c35ba80-5441-11eb-9629-888044e6849b.png)
 
-* __Create client__
+## Create client
   1. Create `index.html`
     ```html
     <!DOCTYPE html>
