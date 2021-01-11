@@ -1,6 +1,9 @@
 # GraphQL by Example
+Udemy course "GraphQL by Example"
 
 Learn GraphQL by writing full-stack JavaScript applications with Node.js, Express, Apollo Server, React, Apollo Client.
+
+https://www.udemy.com/course/graphql-by-example/
 
 ## Hello world
 * __Create server__
