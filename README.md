@@ -12,7 +12,8 @@ https://www.udemy.com/course/graphql-by-example/
   3. Add dependences  
   `$> npm install apollo-server graphql`
   4. Add server code code
-      ```      const {ApolloServer, gql} = require ('apollo-server')
+      ```js
+      const {ApolloServer, gql} = require ('apollo-server')
 
       const typeDefs =  gql`
         schema {
