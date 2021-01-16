@@ -1,4 +1,16 @@
 # GraphQL by Example
+
+<!-- TOC depthfrom:2 depthto:4 orderedlist:false -->
+
+- [Intro](#intro)
+- [Hello world](#hello-world)
+    - [Create server](#create-server)
+    - [Create client](#create-client)
+- [Job board](#job-board)
+
+<!-- /TOC -->
+
+## Intro
 Udemy course "GraphQL by Example"
 
 Learn GraphQL by writing full-stack JavaScript applications with Node. Express, Apollo Server, React, Apollo Client.
@@ -37,7 +49,7 @@ https://www.udemy.com/course/graphql-by-example/
   5. Test request with playground.
 ![playground](https://user-images.githubusercontent.com/725743/104221625-6c35ba80-5441-11eb-9629-888044e6849b.png)
 
-## Create client
+### Create client
   1. Create `index.html`
 ```html
 <!DOCTYPE html>
@@ -49,7 +61,7 @@ https://www.udemy.com/course/graphql-by-example/
 </head>
 <body>
   <h1>Loading</h1>
-  <script src="app. </script>
+  <script src="app.js"></script>
 </body>
 </html>
 ```
@@ -81,3 +93,48 @@ fetchGreeting().then(({gretting}) =>
 }
 );  
 ```
+
+## Job board
+* Copy backbone project from: https://github.com/uptoskill/graphql-job-board
+* Build and start client and server
+```shell
+npm install 
+npm start
+```
+
+https://www.apollographql.com/docs/apollo-server/integrations/middleware/
+
+* Install _apollo-server-express_ and _graphql_ package: 
+  `npm install apollo-server-express graphql`
+
+* On __server.js__ add required packages:
+```js
+const fs = require('fs')
+const {ApolloServer, gql} = require('apollo-server-express');
+```
+
+* Create schema in a separate file: __schema.graphql__
+```js
+type Query {
+    greeting: String
+}
+```
+
+* Create resolvers in a separate file: __resolvers.js__
+```js
+const Query = {
+  gretting: () => 'Hello world 😜'
+}
+module.exports = { Query };
+```
+
+* Load schema and resolvers on the server.js (fs module is required)
+```js
+  const typeDefs = gql(fs.readFileSync('./schema.graphql', {encoding: 'utf8'}));
+  const resolvers = require('./resolvers')
+  const apolloServer = new ApolloServer({typeDefs, resolvers});
+  apolloServer.applyMiddleware({app, path: '/graphql'});
+```
+
+
+

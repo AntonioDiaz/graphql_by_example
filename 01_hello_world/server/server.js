@@ -5,12 +5,12 @@ const typeDefs =  gql`
     query: Query
   }
   type Query {
-    gretting: String
+    greeting: String
   }`;
 
 const resolvers =  {
   Query: {
-    gretting: () => 'Hello GraphQL World :)'
+    greeting: () => 'Hello GraphQL World :)'
   }
 }
 
