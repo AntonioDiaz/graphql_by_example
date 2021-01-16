@@ -1,7 +1,9 @@
-schema {
-  query: Query
+type Query {
+  jobs: [Job]
 }
 
-type Query {
-  greeting: String
+type Job {
+  id: ID!
+  title: String
+  description: String
 }

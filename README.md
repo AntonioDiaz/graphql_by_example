@@ -7,6 +7,8 @@
     - [Create server](#create-server)
     - [Create client](#create-client)
 - [Job board](#job-board)
+    - [Step 01: return greeting](#step-01-return-greeting)
+    - [Step 02: return jobs](#step-02-return-jobs)
 
 <!-- /TOC -->
 
@@ -95,6 +97,7 @@ fetchGreeting().then(({gretting}) =>
 ```
 
 ## Job board
+### Step 01: return greeting
 * Copy backbone project from: https://github.com/uptoskill/graphql-job-board
 * Build and start client and server
 ```shell
@@ -114,7 +117,7 @@ const {ApolloServer, gql} = require('apollo-server-express');
 ```
 
 * Create schema in a separate file: __schema.graphql__
-```js
+```graphql
 type Query {
     greeting: String
 }
@@ -136,5 +139,27 @@ module.exports = { Query };
   apolloServer.applyMiddleware({app, path: '/graphql'});
 ```
 
+### Step 02: return jobs
+* Update the schema to add the job type
+```graphql
+type Query {
+  jobs: [Job]
+}
 
+type Job {
+  id: ID!
+  title: String
+  description: String
+}
+```
+* Update the revolver to return the jobs list
+```js
+const db = require('./db');
+const Query = {
+    jobs: () => db.jobs.list()
+};
+module.exports = { Query };
+```
+* Playground  
+![playground_02](https://user-images.githubusercontent.com/725743/104811155-e7102400-57f9-11eb-8c48-d56b8b3b63a5.png)
 
