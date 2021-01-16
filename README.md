@@ -9,7 +9,8 @@
 - [Job board](#job-board)
     - [Step 01: return greeting](#step-01-return-greeting)
     - [Step 02: return jobs](#step-02-return-jobs)
-    - [Step 03: object assoctiations](#step-03-object-assoctiations)
+    - [Step 03: object associations](#step-03-object-associations)
+    - [Step 04: client fetch data from server](#step-04-client-fetch-data-from-server)
 
 <!-- /TOC -->
 
@@ -164,24 +165,23 @@ module.exports = { Query };
 * Playground  
 ![playground_02](https://user-images.githubusercontent.com/725743/104811155-e7102400-57f9-11eb-8c48-d56b8b3b63a5.png)
 
-### Step 03: object assoctiations
+### Step 03: object associations
 * Create new entity (company) and the reference.
 ```graphql
+type Company {
+  id: ID!
+  name: String
+  description: String
+}
 type Job {
   id: ID!
   title: String
   description: String
   company: Company
 }
-
-type Company {
-  id: ID!
-  name: String
-  description: String
-}
 ```
 
-* Create the resolver and export it
+* Create the resolver (Job) and export it
 ```js
 const Job = {
     company: (job) => db.companies.get(job.companyId)
@@ -192,3 +192,60 @@ module.exports = { Query, Job };
 
 * Check there is a company on the job object
 ![playground_02](https://user-images.githubusercontent.com/725743/104819502-2d7f7600-582e-11eb-957c-efd4428906ba.png)
+
+### Step 04: client fetch data from server
+* Create file to encapsulate the requests (__requests.js__)
+```js
+const ENDPOINT_URL = "http://localhost:9000/graphql"
+
+export async function loadJobs() {
+    const response = await fetch(ENDPOINT_URL, {
+        method: 'POST',
+        headers: {'content-type': 'application/json'},
+        body: JSON.stringify({
+            query: ` {
+                jobs {
+                    id
+                    title
+                    company {
+                        id
+                        name
+                    }
+                }
+              }`
+        })
+    });
+    const responseBody = await response.json();
+    return responseBody.data.jobs;
+}
+```
+
+* Update JobBoard.js to do the fetch:
+```js
+import React, { Component } from 'react';
+import { JobList } from './JobList';
+import { loadJobs } from './requests'
+
+export class JobBoard extends Component {
+
+  constructor(props) {
+    super(props)
+    this.state = { jobs: []};
+  }
+
+  async componentDidMount() {
+    const jobs = await loadJobs();
+    this.setState({jobs});
+  }
+
+  render() {
+    const {jobs} = this.state
+    return (
+      <div>
+        <h1 className="title">Job Board</h1>
+        <JobList jobs={jobs} />
+      </div>
+    );
+  }
+}
+```
