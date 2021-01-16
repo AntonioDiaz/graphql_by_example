@@ -9,6 +9,7 @@
 - [Job board](#job-board)
     - [Step 01: return greeting](#step-01-return-greeting)
     - [Step 02: return jobs](#step-02-return-jobs)
+    - [Step 03: object assoctiations](#step-03-object-assoctiations)
 
 <!-- /TOC -->
 
@@ -163,3 +164,31 @@ module.exports = { Query };
 * Playground  
 ![playground_02](https://user-images.githubusercontent.com/725743/104811155-e7102400-57f9-11eb-8c48-d56b8b3b63a5.png)
 
+### Step 03: object assoctiations
+* Create new entity (company) and the reference.
+```graphql
+type Job {
+  id: ID!
+  title: String
+  description: String
+  company: Company
+}
+
+type Company {
+  id: ID!
+  name: String
+  description: String
+}
+```
+
+* Create the resolver and export it
+```js
+const Job = {
+    company: (job) => db.companies.get(job.companyId)
+};
+
+module.exports = { Query, Job };
+```
+
+* Check there is a company on the job object
+![playground_02](https://user-images.githubusercontent.com/725743/104819502-2d7f7600-582e-11eb-957c-efd4428906ba.png)
