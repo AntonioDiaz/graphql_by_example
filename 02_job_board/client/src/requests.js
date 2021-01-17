@@ -15,10 +15,10 @@ async function graphqlRequest(query, variables={}) {
 }
 
 export async function loadJobs() {
-    const query = ` {
+    const query = `{
         jobs {
             id
-            titlez
+            title
             company {
                 id
                 name
@@ -30,7 +30,7 @@ export async function loadJobs() {
 }
 
 export async function loadJob(id) {
-    const query = ` query JobQuery ($id: ID!) {
+    const query = `query JobQuery ($id: ID!) {
         job(id: $id){
           id
           title
@@ -43,4 +43,17 @@ export async function loadJob(id) {
       }`;
     const {job} = await graphqlRequest(query, {id})
     return job;
+}
+
+
+export async function loadCompany(id) {
+    const query = `query CompanyQuery ($id: ID!) {
+        company(id: $id){
+          id
+          name
+          description
+        }
+      }`;
+    const {company} = await graphqlRequest(query, {id})
+    return company;
 }
