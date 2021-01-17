@@ -6,7 +6,7 @@
 - [Hello world](#hello-world)
     - [Create server](#create-server)
     - [Create client](#create-client)
-- [Job board](#job-board)
+- [Queries: job board](#queries-job-board)
     - [Step 01: return greeting](#step-01-return-greeting)
     - [Step 02: return jobs](#step-02-return-jobs)
     - [Step 03: object associations](#step-03-object-associations)
@@ -16,6 +16,8 @@
     - [Step 07: refactor request.js](#step-07-refactor-requestjs)
     - [Step 08: handler errors](#step-08-handler-errors)
     - [Step 09: retrive a company](#step-09-retrive-a-company)
+    - [Step 10: show jobs in company detail](#step-10-show-jobs-in-company-detail)
+- [Mutations: job board](#mutations-job-board)
 
 <!-- /TOC -->
 
@@ -103,7 +105,7 @@ fetchGreeting().then(({gretting}) =>
 );  
 ```
 
-## Job board
+## Queries: job board
 ### Step 01: return greeting
 * Copy backbone project from: https://github.com/uptoskill/graphql-job-board
 * Build and start client and server
@@ -482,3 +484,63 @@ async function graphqlRequest(query, variables={}) {
   ```
     * Company detail view:
     ![company_detail](https://user-images.githubusercontent.com/725743/104852122-28d3c400-58f9-11eb-8d88-2d2e38885822.png)
+
+### Step 10: show jobs in company detail
+* Server
+  * Update schema __schema.graphql__ adding jobs field
+  ```graphql
+  type Company {
+    id: ID!
+    name: String
+    description: String
+    jobs: [Job]
+  }  
+  ```
+  * Update resolvers
+  ```js
+  const Company = {
+      jobs: (company) => db.jobs.list().filter((job) => job.companyId === company.id)
+  }  
+  ```
+  * Playground
+    ![company_detail](https://user-images.githubusercontent.com/725743/104852490-941e9580-58fb-11eb-8b67-fba0bcb9b3f9.png)  
+
+* Client
+  * Update the query on _requests.js_ to select jobs
+  ```js
+  export async function loadCompany(id) {
+      const query = `query CompanyQuery ($id: ID!) {
+          company(id: $id){
+            id
+            name
+            description
+            jobs {
+              id 
+              title
+            }
+          }
+        }`;
+      const {company} = await graphqlRequest(query, {id})
+      return company;
+  }
+  ```
+  * Print jobs on _CompanyDetails.js_
+  ```js
+    render() {
+      const {company} = this.state;
+      if (!company)
+        return null;
+      return (
+        <div>
+          <h1 className="title">{company.name}</h1>
+          <div className="box">{company.description}</div>
+          <h1 className="title is-5">Jobs at {company.name}</h1>
+          <JobList jobs={company.jobs} />
+        </div>
+      );
+    }
+  ```
+  * Frontend view  
+  ![show_jobs](https://user-images.githubusercontent.com/725743/104853068-cbdb0c80-58fe-11eb-8be3-9e4968858edc.png)    
+
+## Mutations: job board
