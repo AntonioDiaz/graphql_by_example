@@ -15,6 +15,7 @@
     - [Step 06: update client to show job details](#step-06-update-client-to-show-job-details)
     - [Step 07: refactor request.js](#step-07-refactor-requestjs)
     - [Step 08: handler errors](#step-08-handler-errors)
+    - [Step 09: retrive a company](#step-09-retrive-a-company)
 
 <!-- /TOC -->
 
@@ -414,3 +415,40 @@ async function graphqlRequest(query, variables={}) {
     return responseBody.data;
 }
 ```
+
+### Step 09: retrive a company
+* Server
+  * On __schema.graphql__ add new field on Query type called _company_
+  ```graphql
+  type Query {
+    company(id: ID!): Company
+    job(id: ID!): Job
+    jobs: [Job]
+  }
+  ```
+  * Add the resolver called _company__
+  ```js
+  const Query = {
+      company: (root, {id}) => db.companies.get(id),
+      job: (root, {id}) => db.jobs.get(id),
+      jobs: () => db.jobs.list()
+  };
+  ```
+  * Test it on playground
+  ![playground_company](https://user-images.githubusercontent.com/725743/104851329-aa752300-58f4-11eb-8563-72e23a1b0002.png)
+* Client
+  * On __requests.js__ create loadCompany function
+```js
+export async function loadCompany(id) {
+    const query = `query CompanyQuery ($id: ID!) {
+        company(id: $id){
+          id
+          name
+          description
+        }
+      }`;
+    const {company} = await graphqlRequest(query, {id})
+    return company;
+```
+* on __ComanyDetails.js__ almost same code as __JobDetail.js__
+  
