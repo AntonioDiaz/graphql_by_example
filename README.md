@@ -12,6 +12,7 @@
     - [Step 03: object associations](#step-03-object-associations)
     - [Step 04: client fetch data from server](#step-04-client-fetch-data-from-server)
     - [Step 05: filter entities](#step-05-filter-entities)
+- [Step 06: update client to show job details](#step-06-update-client-to-show-job-details)
 
 <!-- /TOC -->
 
@@ -271,3 +272,70 @@ query {
   }
 }
 ```
+
+## Step 06: update client to show job details
+* Create the query with parameter in playground.
+![playground_parameter](https://user-images.githubusercontent.com/725743/104836077-79243500-58ab-11eb-8912-320fa456c209.png)
+
+* On client at __request.js__
+```js
+export async function loadJob(id) {
+    const response = await fetch(ENDPOINT_URL, {
+        method: 'POST',
+        headers: {'content-type': 'application/json'},
+        body: JSON.stringify({
+            query: ` query JobQuery ($id: ID!) {
+                job(id: $id){
+                  id
+                  title
+                  company {
+                    id
+                    name
+                  }
+                  description
+                }
+              }`,
+              variables: {id}
+        })
+    });
+    const responseBody = await response.json();
+    return responseBody.data.job;
+}
+```
+* On client at __JobDetails.js__ calling to the server query
+```js
+import React, { Component } from 'react';
+import { Link } from 'react-router-dom';
+import { loadJob} from './requests'
+
+export class JobDetail extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {job: null};
+  }
+
+  async componentDidMount() {
+    const {jobId} = this.props.match.params;
+    const job = await loadJob(jobId);
+    this.setState({job});
+  }
+
+  render() {
+    const {job} = this.state;
+    if (!job) {
+      return null;
+    }
+    return (
+      <div>
+        <h1 className="title">{job.title}</h1>
+        <h2 className="subtitle">
+          <Link to={`/companies/${job.company.id}`}>{job.company.name}</Link>
+        </h2>
+        <div className="box">{job.description}</div>
+      </div>
+    );
+  }
+}
+```
+* View job details  
+![job_details](https://user-images.githubusercontent.com/725743/104836541-d4a3f200-58ae-11eb-8f56-6ff767605234.png)
