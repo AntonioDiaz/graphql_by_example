@@ -12,7 +12,8 @@
     - [Step 03: object associations](#step-03-object-associations)
     - [Step 04: client fetch data from server](#step-04-client-fetch-data-from-server)
     - [Step 05: filter entities](#step-05-filter-entities)
-- [Step 06: update client to show job details](#step-06-update-client-to-show-job-details)
+    - [Step 06: update client to show job details](#step-06-update-client-to-show-job-details)
+    - [Step 07: refactor code](#step-07-refactor-code)
 
 <!-- /TOC -->
 
@@ -273,7 +274,8 @@ query {
 }
 ```
 
-## Step 06: update client to show job details
+### Step 06: update client to show job details
+
 * Create the query with parameter in playground.
 ![playground_parameter](https://user-images.githubusercontent.com/725743/104836077-79243500-58ab-11eb-8912-320fa456c209.png)
 
@@ -302,6 +304,7 @@ export async function loadJob(id) {
     return responseBody.data.job;
 }
 ```
+
 * On client at __JobDetails.js__ calling to the server query
 ```js
 import React, { Component } from 'react';
@@ -337,5 +340,54 @@ export class JobDetail extends Component {
   }
 }
 ```
+
 * View job details  
 ![job_details](https://user-images.githubusercontent.com/725743/104836541-d4a3f200-58ae-11eb-8f56-6ff767605234.png)
+
+
+### Step 07: refactor code
+* On __requests.js__ create a function that receives 2 parameters: query and query parameters.
+```js
+async function graphqlRequest(query, variables={}) {
+    const response = await fetch(ENDPOINT_URL, {
+        method: 'POST',
+        headers: {'content-type': 'application/json'},
+        body: JSON.stringify({query, variables})
+    });
+    const responseBody = await response.json();
+    return responseBody.data;
+}
+```
+* Update requests to call the new function
+```js
+export async function loadJobs() {
+    const query = ` {
+        jobs {
+            id
+            title
+            company {
+                id
+                name
+            }
+        }
+      }`;
+    const {jobs} = await graphqlRequest(query)
+    return jobs;
+}
+
+export async function loadJob(id) {
+    const query = ` query JobQuery ($id: ID!) {
+        job(id: $id){
+          id
+          title
+          company {
+            id
+            name
+          }
+          description
+        }
+      }`;
+    const {job} = await graphqlRequest(query, {id})
+    return job;
+}
+```
