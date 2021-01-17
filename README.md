@@ -11,6 +11,7 @@
     - [Step 02: return jobs](#step-02-return-jobs)
     - [Step 03: object associations](#step-03-object-associations)
     - [Step 04: client fetch data from server](#step-04-client-fetch-data-from-server)
+    - [Step 05: filter entities](#step-05-filter-entities)
 
 <!-- /TOC -->
 
@@ -246,6 +247,27 @@ export class JobBoard extends Component {
         <JobList jobs={jobs} />
       </div>
     );
+  }
+}
+```
+
+### Step 05: filter entities
+* On __schema.graphql__ create the new query type: `job(id: ID!): Job`
+```js
+type Query {
+  job(id: ID!): Job
+  jobs: [Job]
+}
+```
+
+* On __resolvers.js__ create the resolver function: `job: (root, args) => db.jobs.get(args.id)` 
+
+* Pass the argument on the query
+```graphql
+query {
+  job(id: "rJKAbDd_z"){
+    id
+    title
   }
 }
 ```
