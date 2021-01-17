@@ -13,7 +13,8 @@
     - [Step 04: client fetch data from server](#step-04-client-fetch-data-from-server)
     - [Step 05: filter entities](#step-05-filter-entities)
     - [Step 06: update client to show job details](#step-06-update-client-to-show-job-details)
-    - [Step 07: refactor code](#step-07-refactor-code)
+    - [Step 07: refactor request.js](#step-07-refactor-requestjs)
+    - [Step 08: handler errors](#step-08-handler-errors)
 
 <!-- /TOC -->
 
@@ -345,7 +346,7 @@ export class JobDetail extends Component {
 ![job_details](https://user-images.githubusercontent.com/725743/104836541-d4a3f200-58ae-11eb-8f56-6ff767605234.png)
 
 
-### Step 07: refactor code
+### Step 07: refactor request.js
 * On __requests.js__ create a function that receives 2 parameters: query and query parameters.
 ```js
 async function graphqlRequest(query, variables={}) {
@@ -389,5 +390,27 @@ export async function loadJob(id) {
       }`;
     const {job} = await graphqlRequest(query, {id})
     return job;
+}
+```
+
+### Step 08: handler errors
+
+* Grapql server return json with the errors messages
+![query_error](https://user-images.githubusercontent.com/725743/104837494-2cddf280-58b5-11eb-93c1-99a347ca9d05.png)
+
+* Update __requests.js__ to show the error messaga on the browser
+```js
+async function graphqlRequest(query, variables={}) {
+    const response = await fetch(ENDPOINT_URL, {
+        method: 'POST',
+        headers: {'content-type': 'application/json'},
+        body: JSON.stringify({query, variables})
+    });
+    const responseBody = await response.json();
+    if (responseBody.errors) {
+        const message = responseBody.errors.map((error) => error.message).join('\n');
+        throw new Error(message)
+    }
+    return responseBody.data;
 }
 ```
