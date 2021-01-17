@@ -426,7 +426,7 @@ async function graphqlRequest(query, variables={}) {
     jobs: [Job]
   }
   ```
-  * Add the resolver called _company__
+  * Add the resolver called _company_
   ```js
   const Query = {
       company: (root, {id}) => db.companies.get(id),
@@ -480,3 +480,5 @@ async function graphqlRequest(query, variables={}) {
     }
   }  
   ```
+    * Company detail view:
+    ![company_detail](https://user-images.githubusercontent.com/725743/104852122-28d3c400-58f9-11eb-8d88-2d2e38885822.png)
