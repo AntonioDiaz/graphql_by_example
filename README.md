@@ -4,20 +4,21 @@
 
 - [Intro](#intro)
 - [Hello world](#hello-world)
-    - [Create server](#create-server)
-    - [Create client](#create-client)
+  - [Create server](#create-server)
+  - [Create client](#create-client)
 - [Queries: job board](#queries-job-board)
-    - [Step 01: return greeting](#step-01-return-greeting)
-    - [Step 02: return jobs](#step-02-return-jobs)
-    - [Step 03: object associations](#step-03-object-associations)
-    - [Step 04: client fetch data from server](#step-04-client-fetch-data-from-server)
-    - [Step 05: filter entities](#step-05-filter-entities)
-    - [Step 06: update client to show job details](#step-06-update-client-to-show-job-details)
-    - [Step 07: refactor request.js](#step-07-refactor-requestjs)
-    - [Step 08: handler errors](#step-08-handler-errors)
-    - [Step 09: retrive a company](#step-09-retrive-a-company)
-    - [Step 10: show jobs in company detail](#step-10-show-jobs-in-company-detail)
+  - [Step 01: return greeting](#step-01-return-greeting)
+  - [Step 02: return jobs](#step-02-return-jobs)
+  - [Step 03: object associations](#step-03-object-associations)
+  - [Step 04: client fetch data from server](#step-04-client-fetch-data-from-server)
+  - [Step 05: filter entities](#step-05-filter-entities)
+  - [Step 06: update client to show job details](#step-06-update-client-to-show-job-details)
+  - [Step 07: refactor request.js](#step-07-refactor-requestjs)
+  - [Step 08: handler errors](#step-08-handler-errors)
+  - [Step 09: retrive a company](#step-09-retrive-a-company)
+  - [Step 10: show jobs in company detail](#step-10-show-jobs-in-company-detail)
 - [Mutations: job board](#mutations-job-board)
+  - [Step 01: create a new record](#step-01-create-a-new-record)
 
 <!-- /TOC -->
 
@@ -544,3 +545,29 @@ async function graphqlRequest(query, variables={}) {
   ![show_jobs](https://user-images.githubusercontent.com/725743/104853068-cbdb0c80-58fe-11eb-8be3-9e4968858edc.png)    
 
 ## Mutations: job board
+* Mutations: operation to modify the data.
+* Mutation is a root type as Query
+
+### Step 01: create a new record
+* On __schema.graphql__ add the new mutation inside the mutation type:
+```graphql
+type Mutation {
+  createJob(companyId:ID, title: String, description: String): ID
+}
+```
+
+* On __resolvers.js__ definde de operation and export it:
+```js
+const Mutation = {
+    createJob: (root, {companyId, title, description}) => {
+        return db.jobs.create({companyId, title, description});
+    }
+}
+
+module.exports = { Query, Mutation, Job, Company };
+```
+
+* Test the operation on the playground  
+
+![mutation](https://user-images.githubusercontent.com/725743/104961657-0f08ae80-59d7-11eb-8dfc-ef53addc6712.png)
+
