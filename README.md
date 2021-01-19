@@ -20,7 +20,8 @@
 - [Mutations: job board](#mutations-job-board)
     - [Step 01: create a new record](#step-01-create-a-new-record)
     - [Step 02: return the new entity when creating](#step-02-return-the-new-entity-when-creating)
-    - [Step 03: input type](#step-03-input-type)
+    - [Step 03: define mutations input type](#step-03-define-mutations-input-type)
+    - [Step 04: call mutations from client](#step-04-call-mutations-from-client)
 
 <!-- /TOC -->
 
@@ -596,7 +597,7 @@ const Mutation = {
 
 ![mutation](https://user-images.githubusercontent.com/725743/105067255-cf49d180-5a7f-11eb-9739-960f8ace4343.png)
 
-### Step 03: input type
+### Step 03: define mutations input type
 * Reduce the number of arguments defining a new type
 ```graphql
 type Mutation {
@@ -622,3 +623,28 @@ const Mutation = {
 
 ![mutation_input_type](https://user-images.githubusercontent.com/725743/105069323-10db7c00-5a82-11eb-8ffe-b76264d00266.png)
 
+
+### Step 04: call mutations from client
+* New function to send a mutation is the same as sending a query, on __requests.js__
+```js
+export async function createJob(input) {
+  const mutation = `mutation CreateJob($input: CreateJobInput) {
+    job: createJob (input: $input) {
+      id, title, description, company {id, name}
+    }
+  }`;
+  const {job} = await graphqlRequest(mutation, {input});
+  return job;
+}
+```
+* Call the function from __JobForm.js__
+```js
+handleClick(event) {
+  event.preventDefault();
+  const companyId = "SJV0-wdOM"
+  const {title, description} = this.state
+  createJob({companyId, title, description}).then((job) => {
+    this.props.history.push(`/jobs/${job.id}`)
+  });
+}
+```
