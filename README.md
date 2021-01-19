@@ -619,5 +619,6 @@ const Mutation = {
 }
 ```
 * Playground  
+
 ![mutation_input_type](https://user-images.githubusercontent.com/725743/105069323-10db7c00-5a82-11eb-8ffe-b76264d00266.png)
 
