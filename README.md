@@ -4,21 +4,23 @@
 
 - [Intro](#intro)
 - [Hello world](#hello-world)
-  - [Create server](#create-server)
-  - [Create client](#create-client)
+    - [Create server](#create-server)
+    - [Create client](#create-client)
 - [Queries: job board](#queries-job-board)
-  - [Step 01: return greeting](#step-01-return-greeting)
-  - [Step 02: return jobs](#step-02-return-jobs)
-  - [Step 03: object associations](#step-03-object-associations)
-  - [Step 04: client fetch data from server](#step-04-client-fetch-data-from-server)
-  - [Step 05: filter entities](#step-05-filter-entities)
-  - [Step 06: update client to show job details](#step-06-update-client-to-show-job-details)
-  - [Step 07: refactor request.js](#step-07-refactor-requestjs)
-  - [Step 08: handler errors](#step-08-handler-errors)
-  - [Step 09: retrive a company](#step-09-retrive-a-company)
-  - [Step 10: show jobs in company detail](#step-10-show-jobs-in-company-detail)
+    - [Step 01: return greeting](#step-01-return-greeting)
+    - [Step 02: return jobs](#step-02-return-jobs)
+    - [Step 03: object associations](#step-03-object-associations)
+    - [Step 04: client fetch data from server](#step-04-client-fetch-data-from-server)
+    - [Step 05: filter entities](#step-05-filter-entities)
+    - [Step 06: update client to show job details](#step-06-update-client-to-show-job-details)
+    - [Step 07: refactor request.js](#step-07-refactor-requestjs)
+    - [Step 08: handler errors](#step-08-handler-errors)
+    - [Step 09: retrive a company](#step-09-retrive-a-company)
+    - [Step 10: show jobs in company detail](#step-10-show-jobs-in-company-detail)
 - [Mutations: job board](#mutations-job-board)
-  - [Step 01: create a new record](#step-01-create-a-new-record)
+    - [Step 01: create a new record](#step-01-create-a-new-record)
+    - [Step 02: return the new entity when creating](#step-02-return-the-new-entity-when-creating)
+    - [Step 03: input type](#step-03-input-type)
 
 <!-- /TOC -->
 
@@ -570,4 +572,52 @@ module.exports = { Query, Mutation, Job, Company };
 * Test the operation on the playground  
 
 ![mutation](https://user-images.githubusercontent.com/725743/104961657-0f08ae80-59d7-11eb-8dfc-ef53addc6712.png)
+
+
+### Step 02: return the new entity when creating
+
+* Update the mutation on __schema_graphql__
+```graphql
+type Mutation {
+  createJob(companyId:ID, title: String, description: String): Job
+}
+```
+
+* Update the mutation on the resolver to return a job intead and id
+```js
+const Mutation = {
+    createJob: (root, {companyId, title, description}) => {
+        const id = db.jobs.create({companyId, title, description});
+        return db.jobs.get(id)
+    }
+}
+```
+* On playground create the job, it is possible to create an alias for the mutation
+
+![mutation](https://user-images.githubusercontent.com/725743/105067255-cf49d180-5a7f-11eb-9739-960f8ace4343.png)
+
+### Step 03: input type
+* Reduce the number of arguments defining a new type
+```graphql
+type Mutation {
+  createJob(input: CreateJobInput): Job
+}
+
+input CreateJobInput {
+  companyId: ID
+  title: String
+  description: String
+}
+```
+* Update the mutation input type
+```js
+const Mutation = {
+    createJob: (root, {input}) => {
+        const id = db.jobs.create(input);
+        return db.jobs.get(id)
+    }
+}
+```
+* Playground  
+![mutation_input_type](https://user-images.githubusercontent.com/725743/105069323-10db7c00-5a82-11eb-8ffe-b76264d00266.png)
 
