@@ -24,6 +24,7 @@
     - [Step 04: call mutations from client](#step-04-call-mutations-from-client)
 - [Authentication: job board](#authentication-job-board)
     - [Step 01: only autenthicated user can post a job](#step-01-only-autenthicated-user-can-post-a-job)
+    - [Step 02: add token on create job request on client](#step-02-add-token-on-create-job-request-on-client)
 
 <!-- /TOC -->
 
@@ -681,3 +682,28 @@ const Mutation = {
   ![unauthenticated](https://user-images.githubusercontent.com/725743/105215085-1d7ad580-5b51-11eb-8f10-92287a9c21d4.png)
   * Playground athenticated user
   ![authenticated](https://user-images.githubusercontent.com/725743/105215163-36838680-5b51-11eb-8718-4d7e676a9b12.png)
+
+### Step 02: add token on create job request on client
+* On __request.js__ if user is logged add the session token to the request headers, we can user functions `isloggedIn` and `getAccessToken` from `auth.js`
+```js
+async function graphqlRequest(query, variables={}) {
+    const request = {
+      method: 'POST',
+      headers: {'content-type': 'application/json'},
+      body: JSON.stringify({query, variables})
+    };
+    if (isLoggedIn()) {
+      request.headers['authorization'] = 'Bearer ' + getAccessToken();
+    }
+    const response = await fetch(ENDPOINT_URL, request);
+    const responseBody = await response.json();
+    if (responseBody.errors) {
+        const message = responseBody.errors.map((error) => error.message).join('\n');
+        throw new Error(message)
+    }
+    return responseBody.data;
+}
+```
+* View token on dev tools 
+  ![session_token](https://user-images.githubusercontent.com/725743/105226612-81f16100-5b60-11eb-89c0-5d26a113cd08.png)
+
