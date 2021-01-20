@@ -25,6 +25,7 @@
 - [Authentication: job board](#authentication-job-board)
     - [Step 01: only autenthicated user can post a job](#step-01-only-autenthicated-user-can-post-a-job)
     - [Step 02: add token on create job request on client](#step-02-add-token-on-create-job-request-on-client)
+    - [Step 03: Create jobs with the company of the logged user](#step-03-create-jobs-with-the-company-of-the-logged-user)
 
 <!-- /TOC -->
 
@@ -704,6 +705,45 @@ async function graphqlRequest(query, variables={}) {
     return responseBody.data;
 }
 ```
-* View token on dev tools 
-  ![session_token](https://user-images.githubusercontent.com/725743/105226612-81f16100-5b60-11eb-89c0-5d26a113cd08.png)
+* View token on dev tools  
+
+![session_token](https://user-images.githubusercontent.com/725743/105226612-81f16100-5b60-11eb-89c0-5d26a113cd08.png)
+
+### Step 03: Create jobs with the company of the logged user
+* On server
+  * `server.js`add the database user to the context used for Apollo server
+```js
+const context = ({req}) => ({user: req.user && db.users.get(req.user.sub)});
+```  
+  * On `schema.graphql`: remove the companyId from the imput, because it will be added on the resolver.
+```js
+input CreateJobInput {
+  title: String
+  description: String
+}
+```  
+  * On `resolvers.js`: add the `companyId` to the mutation from the user in the context
+```js
+const Mutation = {
+    createJob: (root, {input}, context) => {
+        if (!context.user) {
+            throw new Error("Unautorized")
+        }
+        const id = db.jobs.create({...input, companyId: context.user.companyId});
+        return db.jobs.get(id)
+    }
+}
+```  
+* On client
+  * On `JobForm.js` there is no need to send the companyId any more.
+```js
+handleClick(event) {
+  event.preventDefault();
+  const {title, description} = this.state
+  createJob({title, description}).then((job) => {
+    this.props.history.push(`/jobs/${job.id}`)
+  });
+}
+```  
+
 
