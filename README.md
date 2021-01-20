@@ -22,6 +22,8 @@
     - [Step 02: return the new entity when creating](#step-02-return-the-new-entity-when-creating)
     - [Step 03: define mutations input type](#step-03-define-mutations-input-type)
     - [Step 04: call mutations from client](#step-04-call-mutations-from-client)
+- [Authentication: job board](#authentication-job-board)
+    - [Step 01: only autenthicated user can post a job](#step-01-only-autenthicated-user-can-post-a-job)
 
 <!-- /TOC -->
 
@@ -637,6 +639,7 @@ export async function createJob(input) {
   return job;
 }
 ```
+
 * Call the function from __JobForm.js__
 ```js
 handleClick(event) {
@@ -648,3 +651,33 @@ handleClick(event) {
   });
 }
 ```
+
+## Authentication: job board
+### Step 01: only autenthicated user can post a job
+* https://www.npmjs.com/package/express-jwt
+* Avoid unauthenticated users post a job through the playground.
+* Check user authenticated on the resolver.
+  * On __server.js__ add the user to the context when creating the ApolloServer.
+```js
+const context = ({req}) => ({user: req.user});
+const apolloServer = new ApolloServer({typeDefs, resolvers, context});  
+```
+  * On the resolver check it there is an user on the context, and return exception if not.
+```js
+const Mutation = {
+    createJob: (root, {input}, context) => {
+        if (!context.user) {
+            throw new Error("Unautorized")
+        }
+        const id = db.jobs.create(input);
+        return db.jobs.get(id)
+    }
+}
+```  
+* Testing
+  * Get token from the browser:
+  ![token](https://user-images.githubusercontent.com/725743/105215031-0cca5f80-5b51-11eb-90b3-af596bebab10.png)
+  * Playground unathenticated user
+  ![unauthenticated](https://user-images.githubusercontent.com/725743/105215085-1d7ad580-5b51-11eb-8f10-92287a9c21d4.png)
+  * Playground athenticated user
+  ![authenticated](https://user-images.githubusercontent.com/725743/105215163-36838680-5b51-11eb-8718-4d7e676a9b12.png)
