@@ -4,28 +4,32 @@
 
 - [Intro](#intro)
 - [Hello world](#hello-world)
-    - [Create server](#create-server)
-    - [Create client](#create-client)
+  - [Create server](#create-server)
+  - [Create client](#create-client)
 - [Queries: job board](#queries-job-board)
-    - [Step 01: return greeting](#step-01-return-greeting)
-    - [Step 02: return jobs](#step-02-return-jobs)
-    - [Step 03: object associations](#step-03-object-associations)
-    - [Step 04: client fetch data from server](#step-04-client-fetch-data-from-server)
-    - [Step 05: filter entities](#step-05-filter-entities)
-    - [Step 06: update client to show job details](#step-06-update-client-to-show-job-details)
-    - [Step 07: refactor request.js](#step-07-refactor-requestjs)
-    - [Step 08: handler errors](#step-08-handler-errors)
-    - [Step 09: retrive a company](#step-09-retrive-a-company)
-    - [Step 10: show jobs in company detail](#step-10-show-jobs-in-company-detail)
+  - [Step 01: return greeting](#step-01-return-greeting)
+  - [Step 02: return jobs](#step-02-return-jobs)
+  - [Step 03: object associations](#step-03-object-associations)
+  - [Step 04: client fetch data from server](#step-04-client-fetch-data-from-server)
+  - [Step 05: filter entities](#step-05-filter-entities)
+  - [Step 06: update client to show job details](#step-06-update-client-to-show-job-details)
+  - [Step 07: refactor request.js](#step-07-refactor-requestjs)
+  - [Step 08: handler errors](#step-08-handler-errors)
+  - [Step 09: retrive a company](#step-09-retrive-a-company)
+  - [Step 10: show jobs in company detail](#step-10-show-jobs-in-company-detail)
 - [Mutations: job board](#mutations-job-board)
-    - [Step 01: create a new record](#step-01-create-a-new-record)
-    - [Step 02: return the new entity when creating](#step-02-return-the-new-entity-when-creating)
-    - [Step 03: define mutations input type](#step-03-define-mutations-input-type)
-    - [Step 04: call mutations from client](#step-04-call-mutations-from-client)
+  - [Step 01: create a new record](#step-01-create-a-new-record)
+  - [Step 02: return the new entity when creating](#step-02-return-the-new-entity-when-creating)
+  - [Step 03: define mutations input type](#step-03-define-mutations-input-type)
+  - [Step 04: call mutations from client](#step-04-call-mutations-from-client)
 - [Authentication: job board](#authentication-job-board)
-    - [Step 01: only autenthicated user can post a job](#step-01-only-autenthicated-user-can-post-a-job)
-    - [Step 02: add token on create job request on client](#step-02-add-token-on-create-job-request-on-client)
-    - [Step 03: Create jobs with the company of the logged user](#step-03-create-jobs-with-the-company-of-the-logged-user)
+  - [Step 01: only autenthicated user can post a job](#step-01-only-autenthicated-user-can-post-a-job)
+  - [Step 02: add token on create job request on client](#step-02-add-token-on-create-job-request-on-client)
+  - [Step 03: Create jobs with the company of the logged user](#step-03-create-jobs-with-the-company-of-the-logged-user)
+- [Apollo Client](#apollo-client)
+  - [Step 01: install and config Apollo client](#step-01-install-and-config-apollo-client)
+  - [Step 02: queries with Apollo Client](#step-02-queries-with-apollo-client)
+  - [Step 03: authenticatin with ApolloLink](#step-03-authenticatin-with-apollolink)
 
 <!-- /TOC -->
 
@@ -722,6 +726,7 @@ input CreateJobInput {
   description: String
 }
 ```  
+
   * On `resolvers.js`: add the `companyId` to the mutation from the user in the context
 ```js
 const Mutation = {
@@ -746,4 +751,93 @@ handleClick(event) {
 }
 ```  
 
+## Apollo Client
+### Step 01: install and config Apollo client
+* https://www.apollographql.com/docs/react/
+* Install packages
+`$> npm install apollo-boost graphql`
 
+* On `request.js` import packages and declare new apollo client instance
+```js
+import { ApolloClient, HttpLink, InMemoryCache } from 'apollo-boost';
+
+const client = new ApolloClient ({
+  link: new HttpLink({uri: 'http://localhost:9000/graphql'}),
+  cache: new InMemoryCache()
+});
+```
+
+### Step 02: queries with Apollo Client
+* Import `gql` library
+```js
+import gql from 'graphql-tag';
+```
+
+* Update the queries: create an object `gql`and call the method `query` from the client with an object with the query and the variables.
+```js
+//...
+export async function loadJob(id) {
+    const query = gql`
+      query JobQuery ($id: ID!) {
+        job(id: $id){
+          id
+          title
+          company {
+            id
+            name
+          }
+          description
+        }
+      }`;    
+    const {data: {job}} = await client.query({query, variables: {id}}); 
+    return job;
+}
+```
+
+* Update the mutations, same as queries but call the function __mutate__ instead query.
+```js
+export async function createJob(input) {
+  const mutation = gql`
+    mutation CreateJob($input: CreateJobInput) {
+      job: createJob (input: $input) {
+        id, 
+        title, 
+        description, 
+        company {
+          id, 
+          name
+        }
+      }
+  }`;
+  const {data: {job}} = await client.mutate({mutation, variables: {input}});
+  return job;
+}
+```
+### Step 03: authenticatin with ApolloLink
+* Import `ApolloLink`
+`import { ApolloClient, HttpLink, InMemoryCache, ApolloLink} from 'apollo-boost';`
+
+* Define the ApolloLink where adding the session token 
+```js
+const authLink = new ApolloLink((operation, forward) => {
+  if (isLoggedIn()) {
+    operation.setContext({
+      headers: {
+        'authorization': 'Bearer ' + getAccessToken()
+      }
+    })
+  }
+  return forward(operation);
+});
+```
+
+* Add the new ApolloLink to be invoked before the operation (query or mutation)
+```js
+const client = new ApolloClient ({
+  link: ApolloLink.from([
+    authLink,
+    new HttpLink({uri: ENDPOINT_URL})
+  ]),
+  cache: new InMemoryCache()
+});
+```
