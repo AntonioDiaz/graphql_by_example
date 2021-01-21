@@ -31,7 +31,7 @@
   - [Step 02: queries with Apollo Client](#step-02-queries-with-apollo-client)
   - [Step 03: authenticatin with ApolloLink](#step-03-authenticatin-with-apollolink)
   - [Step 04: caching and fetch policy](#step-04-caching-and-fetch-policy)
-  - [Step 05: Update the cache when crating a job](#step-05-update-the-cache-when-crating-a-job)
+  - [Step 05: Update the cache after crating a job](#step-05-update-the-cache-after-crating-a-job)
 
 <!-- /TOC -->
 
@@ -856,7 +856,7 @@ https://www.apollographql.com/docs/react/data/queries/#supported-fetch-policies
 const {data: {jobs}} = await client.query({query, fetchPolicy: 'no-cache'});
 ```
 
-### Step 05: Update the cache when crating a job
+### Step 05: Update the cache after crating a job
 * The objetive is to avoid a request after creating a job.
 
 * Declare the query of a job in a constant
