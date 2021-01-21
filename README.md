@@ -30,6 +30,8 @@
   - [Step 01: install and config Apollo client](#step-01-install-and-config-apollo-client)
   - [Step 02: queries with Apollo Client](#step-02-queries-with-apollo-client)
   - [Step 03: authenticatin with ApolloLink](#step-03-authenticatin-with-apollolink)
+  - [Step 04: caching and fetch policy](#step-04-caching-and-fetch-policy)
+  - [Step 05: Update the cache when crating a job](#step-05-update-the-cache-when-crating-a-job)
 
 <!-- /TOC -->
 
@@ -840,4 +842,69 @@ const client = new ApolloClient ({
   ]),
   cache: new InMemoryCache()
 });
+```
+
+### Step 04: caching and fetch policy
+
+* Now it is catching the queries
+
+* Customize caching behaviour
+https://www.apollographql.com/docs/react/data/queries/#supported-fetch-policies
+
+* To always get fresh data from the server:
+```js
+const {data: {jobs}} = await client.query({query, fetchPolicy: 'no-cache'});
+```
+
+### Step 05: Update the cache when crating a job
+* The objetive is to avoid a request after creating a job.
+
+* Declare the query of a job in a constant
+```js
+const jobQuery = gql `query JobQuery ($id: ID!) {
+  job(id: $id){
+    id
+    title
+    company {
+      id
+      name
+    }
+    description
+  }
+}`;
+
+export async function loadJob(id) {
+    const {data: {job}} = await client.query({query: jobQuery, variables: {id}}); 
+    return job;
+}
+```
+
+* On __requests.js__ add a new parameter on method mutate from client:
+```js
+export async function createJob(input) {
+  const mutation = gql`
+    mutation CreateJob($input: CreateJobInput) {
+      job: createJob (input: $input) {
+        id
+        title
+        company {
+          id
+          name
+        }
+        description
+      }
+  }`;
+  const {data: {job}} = await client.mutate({
+    mutation, 
+    variables: {input},
+    update: (cache, {data}) => {
+      cache.writeQuery({
+        query: jobQuery,
+        variables: {id: data.job.id},
+        data
+      })
+    }
+  });
+  return job;
+}
 ```
