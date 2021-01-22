@@ -1,1 +1,0 @@
-{"version":3,"sources":["style.css"],"names":[],"mappings":"AAIA,wBAHE,wBAMF,CAHA,mBAEE,WACF","file":"main.d2ec7683.chunk.css","sourcesContent":["html {\n  background-color: #b4dcfd;\n}\n\nbutton.navbar-item {\n  background-color: #b4dcfd;\n  border: none;\n}\n"]}
