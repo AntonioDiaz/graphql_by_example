@@ -31,7 +31,8 @@
   - [Step 02: queries with Apollo Client](#step-02-queries-with-apollo-client)
   - [Step 03: authenticatin with ApolloLink](#step-03-authenticatin-with-apollolink)
   - [Step 04: caching and fetch policy](#step-04-caching-and-fetch-policy)
-  - [Step 05: Update the cache after crating a job](#step-05-update-the-cache-after-crating-a-job)
+  - [Step 05: Update the cache after a mutation](#step-05-update-the-cache-after-a-mutation)
+  - [Step 06: fragments](#step-06-fragments)
 
 <!-- /TOC -->
 
@@ -856,7 +857,7 @@ https://www.apollographql.com/docs/react/data/queries/#supported-fetch-policies
 const {data: {jobs}} = await client.query({query, fetchPolicy: 'no-cache'});
 ```
 
-### Step 05: Update the cache after crating a job
+### Step 05: Update the cache after a mutation
 * The objetive is to avoid a request after creating a job.
 
 * Declare the query of a job in a constant
@@ -907,4 +908,30 @@ export async function createJob(input) {
   });
   return job;
 }
+```
+### Step 06: fragments
+* The objetive es to avoid repeating code in graphql queries and mutations
+* Define a fragment in playground
+![fragment](https://user-images.githubusercontent.com/725743/105463920-0a6f1f00-5c91-11eb-82ba-b8183eb36d4c.png)
+
+* Define the fragment in the code and use in the mutations and queries.
+```graphql
+const JOB_DETAIL_FRAGMENT = gql `
+  fragment JobDetail on Job {
+    id
+    title
+    company {
+      id
+      name
+    }
+    description    
+  }`;
+
+const JOB_QUERY = gql `
+  query JobQuery ($id: ID!) {
+    job(id: $id){
+        ...JobDetail
+    }
+  }
+  ${JOB_DETAIL_FRAGMENT}`;
 ```
