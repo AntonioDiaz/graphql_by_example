@@ -4,35 +4,37 @@
 
 - [Intro](#intro)
 - [Hello world](#hello-world)
-  - [Create server](#create-server)
-  - [Create client](#create-client)
+    - [Create server](#create-server)
+    - [Create client](#create-client)
 - [Queries: job board](#queries-job-board)
-  - [Step 01: return greeting](#step-01-return-greeting)
-  - [Step 02: return jobs](#step-02-return-jobs)
-  - [Step 03: object associations](#step-03-object-associations)
-  - [Step 04: client fetch data from server](#step-04-client-fetch-data-from-server)
-  - [Step 05: filter entities](#step-05-filter-entities)
-  - [Step 06: update client to show job details](#step-06-update-client-to-show-job-details)
-  - [Step 07: refactor request.js](#step-07-refactor-requestjs)
-  - [Step 08: handler errors](#step-08-handler-errors)
-  - [Step 09: retrive a company](#step-09-retrive-a-company)
-  - [Step 10: show jobs in company detail](#step-10-show-jobs-in-company-detail)
+    - [Step 01: return greeting](#step-01-return-greeting)
+    - [Step 02: return jobs](#step-02-return-jobs)
+    - [Step 03: object associations](#step-03-object-associations)
+    - [Step 04: client fetch data from server](#step-04-client-fetch-data-from-server)
+    - [Step 05: filter entities](#step-05-filter-entities)
+    - [Step 06: update client to show job details](#step-06-update-client-to-show-job-details)
+    - [Step 07: refactor request.js](#step-07-refactor-requestjs)
+    - [Step 08: handler errors](#step-08-handler-errors)
+    - [Step 09: retrive a company](#step-09-retrive-a-company)
+    - [Step 10: show jobs in company detail](#step-10-show-jobs-in-company-detail)
 - [Mutations: job board](#mutations-job-board)
-  - [Step 01: create a new record](#step-01-create-a-new-record)
-  - [Step 02: return the new entity when creating](#step-02-return-the-new-entity-when-creating)
-  - [Step 03: define mutations input type](#step-03-define-mutations-input-type)
-  - [Step 04: call mutations from client](#step-04-call-mutations-from-client)
+    - [Step 01: create a new record](#step-01-create-a-new-record)
+    - [Step 02: return the new entity when creating](#step-02-return-the-new-entity-when-creating)
+    - [Step 03: define mutations input type](#step-03-define-mutations-input-type)
+    - [Step 04: call mutations from client](#step-04-call-mutations-from-client)
 - [Authentication: job board](#authentication-job-board)
-  - [Step 01: only autenthicated user can post a job](#step-01-only-autenthicated-user-can-post-a-job)
-  - [Step 02: add token on create job request on client](#step-02-add-token-on-create-job-request-on-client)
-  - [Step 03: Create jobs with the company of the logged user](#step-03-create-jobs-with-the-company-of-the-logged-user)
+    - [Step 01: only autenthicated user can post a job](#step-01-only-autenthicated-user-can-post-a-job)
+    - [Step 02: add token on create job request on client](#step-02-add-token-on-create-job-request-on-client)
+    - [Step 03: Create jobs with the company of the logged user](#step-03-create-jobs-with-the-company-of-the-logged-user)
 - [Apollo Client](#apollo-client)
-  - [Step 01: install and config Apollo client](#step-01-install-and-config-apollo-client)
-  - [Step 02: queries with Apollo Client](#step-02-queries-with-apollo-client)
-  - [Step 03: authenticatin with ApolloLink](#step-03-authenticatin-with-apollolink)
-  - [Step 04: caching and fetch policy](#step-04-caching-and-fetch-policy)
-  - [Step 05: Update the cache after a mutation](#step-05-update-the-cache-after-a-mutation)
-  - [Step 06: fragments](#step-06-fragments)
+    - [Step 01: install and config Apollo client](#step-01-install-and-config-apollo-client)
+    - [Step 02: queries with Apollo Client](#step-02-queries-with-apollo-client)
+    - [Step 03: authenticatin with ApolloLink](#step-03-authenticatin-with-apollolink)
+    - [Step 04: caching and fetch policy](#step-04-caching-and-fetch-policy)
+    - [Step 05: Update the cache after a mutation](#step-05-update-the-cache-after-a-mutation)
+    - [Step 06: fragments](#step-06-fragments)
+- [Subscriptions: chat application](#subscriptions-chat-application)
+    - [Step 01: download and install dependences](#step-01-download-and-install-dependences)
 
 <!-- /TOC -->
 
@@ -936,3 +938,17 @@ const JOB_QUERY = gql `
   }
   ${JOB_DETAIL_FRAGMENT}`;
 ```
+
+## Subscriptions: chat application
+* https://www.apollographql.com/docs/apollo-server/data/subscriptions/
+* To recive real time updates
+
+### Step 01: download and install dependences
+* Download from here: https://github.com/uptoskill/graphql-chat
+* Install dependences and start for both server and client
+```shell
+  $>npm install
+  $>npm start
+```
+* Front
+![front](https://user-images.githubusercontent.com/725743/105537227-e7288c00-5cf1-11eb-89e8-bc3ff95b7f98.png)
