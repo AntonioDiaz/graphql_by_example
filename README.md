@@ -912,6 +912,7 @@ export async function createJob(input) {
 ### Step 06: fragments
 * The objetive es to avoid repeating code in graphql queries and mutations
 * Define a fragment in playground
+
 ![fragment](https://user-images.githubusercontent.com/725743/105463920-0a6f1f00-5c91-11eb-82ba-b8183eb36d4c.png)
 
 * Define the fragment in the code and use in the mutations and queries.
