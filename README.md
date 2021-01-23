@@ -37,6 +37,7 @@
     - [Step 01: download and install dependences](#step-01-download-and-install-dependences)
     - [Step 02: defining a subscription](#step-02-defining-a-subscription)
     - [Step 03: enabling webshockets in Apollo Server](#step-03-enabling-webshockets-in-apollo-server)
+    - [Step 04: subscription resolver with PubSub](#step-04-subscription-resolver-with-pubsub)
 
 <!-- /TOC -->
 
@@ -981,3 +982,43 @@ type Subscription {
   apolloServer.installSubscriptionHandlers(httpServer);
   httpServer.listen(port, () => console.log(`Server started on port ${port}`));
   ```
+
+### Step 04: subscription resolver with PubSub
+
+* Install `graphql-subscriptions`
+`npm install graphql-subscriptions`
+
+* Import and create some variables 
+```js
+const {PubSub} = require('graphql-subscriptions');
+
+const pubSub = new PubSub();
+```
+
+* Create and export the subscription
+```js
+const Subscription = {
+  messageAdded: {
+    subscribe: () => pubSub.asyncIterator('MESSAGE_ADDED')
+  }
+}
+module.exports = {Query, Mutation, Subscription}
+```
+
+* __resolver.js__ publish message on the mutation
+```js
+const Mutation = {
+  addMessage: (_root, {input}, {userId}) => {
+    requireAuth(userId);
+    const messageId = db.messages.create({from: userId, text: input.text});
+    const message = db.messages.get(messageId);
+    pubSub.publish(MESSAGE_ADDED, {messageAdded: message});
+    return message;
+  }
+}
+```
+* Playground<br>
+<img width="1126" alt="subscription_listening" src="https://user-images.githubusercontent.com/725743/105611050-6b8f1380-5db3-11eb-824b-19e396ca6ff1.png">
+
+
+
