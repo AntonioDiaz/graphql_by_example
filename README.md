@@ -950,5 +950,6 @@ const JOB_QUERY = gql `
   $>npm install
   $>npm start
 ```
-* Front
-![front](https://user-images.githubusercontent.com/725743/105537227-e7288c00-5cf1-11eb-89e8-bc3ff95b7f98.png)
+* Front  
+
+<img src="https://user-images.githubusercontent.com/725743/105537227-e7288c00-5cf1-11eb-89e8-bc3ff95b7f98.png" alt="drawing" width="400"/>
