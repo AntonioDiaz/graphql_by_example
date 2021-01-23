@@ -36,6 +36,7 @@
 - [Subscriptions: chat application](#subscriptions-chat-application)
     - [Step 01: download and install dependences](#step-01-download-and-install-dependences)
     - [Step 02: defining a subscription](#step-02-defining-a-subscription)
+    - [Step 03: enabling webshockets in Apollo Server](#step-03-enabling-webshockets-in-apollo-server)
 
 <!-- /TOC -->
 
@@ -967,4 +968,16 @@ type Subscription {
 
 ![protocol](https://user-images.githubusercontent.com/725743/105609576-8610bf00-5daa-11eb-9bd7-62b9b3e1df7f.png)
 
-
+### Step 03: enabling webshockets in Apollo Server
+* WebSocket: https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API
+* On the `server.js`
+  * Import `http` module
+  ```js
+  const http = require ('http');
+  ```
+  * Prepare the server to receive subscriptions
+  ```js
+  const httpServer = http.createServer(app);
+  apolloServer.installSubscriptionHandlers(httpServer);
+  httpServer.listen(port, () => console.log(`Server started on port ${port}`));
+  ```
