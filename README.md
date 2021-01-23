@@ -35,6 +35,7 @@
     - [Step 06: fragments](#step-06-fragments)
 - [Subscriptions: chat application](#subscriptions-chat-application)
     - [Step 01: download and install dependences](#step-01-download-and-install-dependences)
+    - [Step 02: defining a subscription](#step-02-defining-a-subscription)
 
 <!-- /TOC -->
 
@@ -953,3 +954,17 @@ const JOB_QUERY = gql `
 * Front  
 
 <img src="https://user-images.githubusercontent.com/725743/105537227-e7288c00-5cf1-11eb-89e8-bc3ff95b7f98.png" alt="drawing" width="400"/>
+
+### Step 02: defining a subscription
+* Objetive: notify all chat user when there is a new message
+* Add the subscription to the schema
+```graphql
+type Subscription {
+  messageAdded: Message
+}
+```
+* On the playground we can chech that subcription uses `ws` protocolo instead `http`
+
+![protocol](https://user-images.githubusercontent.com/725743/105609576-8610bf00-5daa-11eb-9bd7-62b9b3e1df7f.png)
+
+
