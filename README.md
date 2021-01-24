@@ -38,6 +38,8 @@
     - [Step 02: defining a subscription](#step-02-defining-a-subscription)
     - [Step 03: enabling webshockets in Apollo Server](#step-03-enabling-webshockets-in-apollo-server)
     - [Step 04: subscription resolver with PubSub](#step-04-subscription-resolver-with-pubsub)
+    - [Step 05: update the front with the new messages](#step-05-update-the-front-with-the-new-messages)
+    - [Step 07: unsubscribe](#step-07-unsubscribe)
 
 <!-- /TOC -->
 
@@ -965,7 +967,7 @@ type Subscription {
   messageAdded: Message
 }
 ```
-* On the playground we can chech that subcription uses `ws` protocolo instead `http`
+* On the playground we can check that subcription uses `ws` protocolo instead `http`
 
 ![protocol](https://user-images.githubusercontent.com/725743/105609576-8610bf00-5daa-11eb-9bd7-62b9b3e1df7f.png)
 
@@ -991,7 +993,7 @@ type Subscription {
 * Import and create some variables 
 ```js
 const {PubSub} = require('graphql-subscriptions');
-
+const MESSAGE_ADDED = 'MESSAGE_ADDED';
 const pubSub = new PubSub();
 ```
 
@@ -999,7 +1001,7 @@ const pubSub = new PubSub();
 ```js
 const Subscription = {
   messageAdded: {
-    subscribe: () => pubSub.asyncIterator('MESSAGE_ADDED')
+    subscribe: () => pubSub.asyncIterator(MESSAGE_ADDED)
   }
 }
 module.exports = {Query, Mutation, Subscription}
@@ -1020,5 +1022,98 @@ const Mutation = {
 * Playground<br>
 <img width="1126" alt="subscription_listening" src="https://user-images.githubusercontent.com/725743/105611050-6b8f1380-5db3-11eb-824b-19e396ca6ff1.png">
 
+### Step 05: update the front with the new messages
+* View pubSub implementations: https://www.apollographql.com/docs/apollo-server/data/subscriptions/#pubsub-implementations
+* [`Redis`](https://github.com/davidyaha/graphql-redis-subscriptions)
+* On client
+  * Install dependences: 
+    ```bash
+    $>npm install apollo-link-ws subscriptions-transport-ws
+    ```
 
+  * Import packages on `client.js`
+  ```js
+   import {WebSocketLink} from 'apollo-link-ws';
+   ```
 
+  * Create the `WebSocketLink`
+  ```js  
+  const wsUrl = 'ws://localhost:9000/graphql';
+  const wsLink = new WebSocketLink({ uri: wsUrl, options: { 
+    lazy: true,
+    reconnect: true
+  }})
+  ```
+
+  * Changes on `client.js` to config Apollo client to use the wsLink
+    * Import the split function
+    ```js
+    import {
+        ApolloClient, ApolloLink, HttpLink, InMemoryCache, split
+      } from 'apollo-boost';
+    ```    
+
+    * Use the split function to distinguis if is subscription or an http link.
+    ```js
+    function isSubscription(operation) {
+      const definition = getMainDefinition(operation.query)
+      return definition.kind === 'OperationDefinition' 
+        && definition.operation === 'subscription';
+    }
+
+    const client = new ApolloClient({
+      cache: new InMemoryCache(),
+      link: split(isSubscription, wsLink, httpLink),
+      defaultOptions: {query: {fetchPolicy: 'no-cache'}}
+    });
+    ```
+
+  * On `queries.js` create the subscription
+  ```js
+  const messageAddedSubscription = gql `subscription {
+    messageAdded {
+      id
+      from
+      text
+    }
+  }`;
+  export function onMessageAdded(handleMessage) {
+    const observable = client.subscribe({query: messageAddedSubscription});
+    return observable.subscribe(({data}) => handleMessage(data.messageAdded));
+  }    
+  ```
+
+  * On `Chat.js` create update the list of the messages
+  ```js
+  async componentDidMount() {
+    const messages = await getMessages();
+    this.setState({messages});
+    this.subscription = onMessageAdded((message) => {
+      this.setState({messages: this.state.messages.concat(message)});
+    })
+  }  
+  ```
+
+### Step 07: unsubscribe
+* On `Chat.js` create an attribute on the component to store the subscription and call the method unsubscribe on the event `componentWillUnmount`
+```js
+class Chat extends Component {
+  state = {messages: []};
+  subscription = null;
+
+  async componentDidMount() {
+    const messages = await getMessages();
+    this.setState({messages});
+    this.subscription = onMessageAdded((message) => {
+      this.setState({messages: this.state.messages.concat(message)});
+    })
+  }
+
+  componentWillUnmount() {
+    if (this.subscription) {
+      this.subscription.unsubscribe();
+    }
+  }
+  ...
+}
+```
