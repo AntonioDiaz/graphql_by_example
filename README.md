@@ -1123,12 +1123,10 @@ class Chat extends Component {
 * On client.js send the access token when creating the webSocket link
 ```js
 const wsLink = new WebSocketLink({ uri: wsUrl, options: { 
-  connectionParams: () => ({
-    accessToken: getAccessToken()
-  }),
+  connectionParams: () => ({ accessToken: getAccessToken() }),
   lazy: true,
   reconnect: true
 } })
 ```
-* Proof client is sending the token.
+* Proof client is sending the token.<br>
 ![web_socket_on_devtools](https://user-images.githubusercontent.com/725743/105753039-5b5c6d00-5f48-11eb-930d-714fe07a8109.png)
