@@ -40,7 +40,8 @@
     - [Step 04: subscription resolver with PubSub](#step-04-subscription-resolver-with-pubsub)
     - [Step 05: update the front with the new messages](#step-05-update-the-front-with-the-new-messages)
     - [Step 06: unsubscribe](#step-06-unsubscribe)
-    - [Step 07: client authentication with websocket](#step-07-client-authentication-with-websocket)
+    - [Step 07: client authentication with websockets](#step-07-client-authentication-with-websockets)
+    - [Step 08: server authentication with websockets](#step-08-server-authentication-with-websockets)
 
 <!-- /TOC -->
 
@@ -1119,7 +1120,7 @@ class Chat extends Component {
 }
 ```
 
-### Step 07: client authentication with websocket
+### Step 07: client authentication with websockets
 * On client.js send the access token when creating the webSocket link
 ```js
 const wsLink = new WebSocketLink({ uri: wsUrl, options: { 
@@ -1128,5 +1129,37 @@ const wsLink = new WebSocketLink({ uri: wsUrl, options: {
   reconnect: true
 } })
 ```
-* Proof client is sending the token.<br>
+* Proof client is sending the token.
+
 ![web_socket_on_devtools](https://user-images.githubusercontent.com/725743/105753039-5b5c6d00-5f48-11eb-930d-714fe07a8109.png)
+
+### Step 08: server authentication with websockets
+* Set the user in session in the context, the token is in the connections not in the request.
+* In `server.js`
+```js
+function context({req, connection}) {
+  if (req && req.user) {
+    return {userId: req.user.sub};
+  }
+  if (connection && connection.context && connection.context.accessToken) {
+    const token = connection.context.accessToken;
+    const decodedToken = jwt.verify(token, jwtSecret);
+    return {userId: decodedToken.sub};
+  }
+  return {};
+}
+```
+* In the subcription resolver we receive the context where there is an attribute (userId) with the user in session, like queries and mutations, now we can validate the user before returning any data.
+* In `resolvers.js`
+```js
+const Subscription = {
+  messageAdded: {
+    //the 3 parameter is the context where is the user in session.
+    subscribe: (_root, _args, {userId}) => {
+      requireAuth(userId);
+      return pubSub.asyncIterator(MESSAGE_ADDED);
+    }
+  }
+}
+```
+
