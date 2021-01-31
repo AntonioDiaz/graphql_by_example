@@ -1172,5 +1172,29 @@ const Subscription = {
 https://www.apollographql.com/docs/react/
 
 ### Step 01: setting up ApolloProvider
-* Install new package
-`npm install @apollo/react-hooks`
+* On the client on `App.js`
+  
+  * Install new package
+  `npm install @apollo/react-hooks`
+
+  * Import the component `ApolloProvider` and the client instance from our graphql module.
+  ```js
+  import { ApolloProvider } from '@apollo/react-hooks'
+  import client from './graphql/client'
+  ```
+  
+  * In the render method grap all with `<ApolloProvider>` tag
+  ```js
+  render() {
+    const {user} = this.state;
+    if (!user) {
+      return <Login onLogin={this.handleLogin.bind(this)} />;
+    }
+    return (
+      <ApolloProvider client={client}>
+        <NavBar onLogout={this.handleLogout.bind(this)} />
+        <Chat user={user} />
+      </ApolloProvider>
+    );  
+  }  
+  ```
