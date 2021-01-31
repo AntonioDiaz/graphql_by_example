@@ -18,7 +18,7 @@ const Query = {
   }
 }
 
-const Mutation = {
+const Mutation = { 
   addMessage: (_root, {input}, {userId}) => {
     requireAuth(userId);
     const messageId = db.messages.create({from: userId, text: input.text});
@@ -26,11 +26,15 @@ const Mutation = {
     pubSub.publish(MESSAGE_ADDED, {messageAdded: message});
     return message;
   }
-}
+} 
 
 const Subscription = {
   messageAdded: {
-    subscribe: () => pubSub.asyncIterator(MESSAGE_ADDED)
+    //the 3 parameter is the context where is the user in session.
+    subscribe: (_root, _args, {userId}) => {
+      requireAuth(userId);
+      return pubSub.asyncIterator(MESSAGE_ADDED);
+    }
   }
 }
 
