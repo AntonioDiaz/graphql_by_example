@@ -1131,9 +1131,13 @@ const wsLink = new WebSocketLink({ uri: wsUrl, options: {
   reconnect: true
 } })
 ```
-* Proof client is sending the token.
+* Proof sending the token from client application.
 
 ![web_socket_on_devtools](https://user-images.githubusercontent.com/725743/105753039-5b5c6d00-5f48-11eb-930d-714fe07a8109.png)
+
+* Proof sending the token from playground.
+
+![playground_token](https://user-images.githubusercontent.com/725743/106393555-0b722000-63f8-11eb-9a33-82495b8f0c87.png)
 
 ### Step 08: server authentication with websockets
 * Set the user in session in the context, the token is in the connections not in the request.
@@ -1168,3 +1172,5 @@ const Subscription = {
 https://www.apollographql.com/docs/react/
 
 ### Step 01: setting up ApolloProvider
+* Install new package
+`npm install @apollo/react-hooks`
