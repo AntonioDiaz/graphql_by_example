@@ -41,6 +41,8 @@
   - [Step 05: update the front with the new messages](#step-05-update-the-front-with-the-new-messages)
   - [Step 06: unsubscribe](#step-06-unsubscribe)
   - [Step 07: client authentication with websocket](#step-07-client-authentication-with-websocket)
+- [Apollo Client with React Hooks](#apollo-client-with-react-hooks)
+  - [Step 01: setting up ApolloProvider](#step-01-setting-up-apolloprovider)
 
 <!-- /TOC -->
 
@@ -1132,3 +1134,8 @@ const wsLink = new WebSocketLink({ uri: wsUrl, options: {
 ```
 * Proof client is sending the token.
 screen shot.
+
+## Apollo Client with React Hooks
+https://www.apollographql.com/docs/react/
+
+### Step 01: setting up ApolloProvider
