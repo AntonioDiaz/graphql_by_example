@@ -44,6 +44,7 @@
   - [Step 08: server authentication with websockets](#step-08-server-authentication-with-websockets)
 - [Apollo Client with React Hooks](#apollo-client-with-react-hooks)
   - [Step 01: setting up ApolloProvider](#step-01-setting-up-apolloprovider)
+  - [Step 02: intro to React Hooks](#step-02-intro-to-react-hooks)
 
 <!-- /TOC -->
 
@@ -1183,7 +1184,7 @@ https://www.apollographql.com/docs/react/
   import client from './graphql/client'
   ```
   
-  * In the render method grap all with `<ApolloProvider>` tag
+  * In the render method grap all with `<ApolloProvider>` tag.
   ```js
   render() {
     const {user} = this.state;
@@ -1198,3 +1199,37 @@ https://www.apollographql.com/docs/react/
     );  
   }  
   ```
+### Step 02: intro to React Hooks
+* React Hooks only works with functions and avoiding writting classes.
+* On Hooks there is no state nor props.
+* New `Chat.js`
+```js
+import React, { useState } from 'react';
+import MessageInput from './MessageInput';
+import MessageList from './MessageList';
+
+const Chat = ({user}) => {
+  const [messages, setMessages] = useState([])
+  
+  const handleSend = (text) => {
+    
+    const message = {id: text, from: 'you', text};
+    setMessages(messages.concat(message));
+  };
+
+  return (
+    <section className="section">
+      <div className="container">
+        <h1 className="title">Chatting as {user}</h1>
+        <MessageList user={user} messages={messages} />
+        <MessageInput onSend={handleSend} />
+      </div>
+    </section>
+  );
+};
+
+export default Chat;
+```
+
+
+
