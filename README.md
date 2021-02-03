@@ -45,6 +45,7 @@
 - [Apollo Client with React Hooks](#apollo-client-with-react-hooks)
   - [Step 01: setting up ApolloProvider](#step-01-setting-up-apolloprovider)
   - [Step 02: intro to React Hooks](#step-02-intro-to-react-hooks)
+  - [Step 03: the useQuery Hook](#step-03-the-usequery-hook)
 
 <!-- /TOC -->
 
@@ -1231,5 +1232,31 @@ const Chat = ({user}) => {
 export default Chat;
 ```
 
+### Step 03: the useQuery Hook
+* https://www.apollographql.com/docs/react/data/queries/
+* On `queries.js` export the constant `messagesQuery`
+```js
+export const messagesQuery = gql`
+  query MessagesQuery {
+    messages {
+      id
+      from
+      text
+    }
+  }
+`;
+```
 
+* On `Chat.js` import `useQuery` and the `messageQuery` and call the useQuery
+```js
+import { useQuery } from '@apollo/react-hooks'
+import { messagesQuery } from './graphql/queries'
+const Chat = ({user}) => {
 
+  const {data} = useQuery(messagesQuery);
+  const messages = data ? data.messages : [];
+
+};
+```
+* UseQuery can also return if is loading or if there is an error:
+` const { loading, error, data } = useQuery(GET_DOGS);`
