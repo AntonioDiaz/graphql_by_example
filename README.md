@@ -46,6 +46,7 @@
   - [Step 01: setting up ApolloProvider](#step-01-setting-up-apolloprovider)
   - [Step 02: intro to React Hooks](#step-02-intro-to-react-hooks)
   - [Step 03: the useQuery Hook](#step-03-the-usequery-hook)
+  - [Step 04: the useMutation Hook](#step-04-the-usemutation-hook)
 
 <!-- /TOC -->
 
@@ -1258,5 +1259,24 @@ const Chat = ({user}) => {
 
 };
 ```
-* UseQuery can also return if is loading or if there is an error:
-` const { loading, error, data } = useQuery(GET_DOGS);`
+* UseQuery can also return if is loading or if there is an error:  
+```js
+const { loading, error, data } = useQuery(GET_DOGS);
+```
+
+### Step 04: the useMutation Hook
+* On `Chat.js` import useMutation and call it:
+```js
+import { useQuery, useMutation } from '@apollo/react-hooks'
+import { messagesQuery, addMessageMutation } from './graphql/queries'
+
+const Chat = ({user}) => {
+
+  const [addMessage] = useMutation(addMessageMutation);
+
+  const handleSend = async (text) => {    
+    await addMessage({variables: {input: {text}}});
+  };
+}
+```
+
