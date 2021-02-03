@@ -47,6 +47,7 @@
   - [Step 02: intro to React Hooks](#step-02-intro-to-react-hooks)
   - [Step 03: the useQuery Hook](#step-03-the-usequery-hook)
   - [Step 04: the useMutation Hook](#step-04-the-usemutation-hook)
+  - [Step 05: the useSubscription Hook](#step-05-the-usesubscription-hook)
 
 <!-- /TOC -->
 
@@ -1280,3 +1281,33 @@ const Chat = ({user}) => {
 }
 ```
 
+### Step 05: the useSubscription Hook
+* Unsubscribe is done automaticaly.
+
+* Imports: 
+```js
+import { useQuery, useMutation, useSubscription } from '@apollo/react-hooks'
+import { messagesQuery, addMessageMutation, messageAddedSubscription } from './graphql/queries'
+```
+
+* Use the subscription hook:
+```js
+useSubscription(messageAddedSubscription, {
+  onSubscriptionData: ({subscriptionData})=> {
+    setMessages(messages.concat(subscriptionData.data.messageAdded));
+  } 
+});
+```
+
+* Using the state to update the messages list:
+```js
+//setMessages is a function that updates the list of messages.
+const [messages, setMessages] = useState([]);
+```
+
+* Initial load of messages
+```js
+useQuery(messagesQuery, {
+  onCompleted: ({messages}) => setMessages(messages)
+});
+```
