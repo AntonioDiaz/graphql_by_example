@@ -48,6 +48,7 @@
   - [Step 03: the useQuery Hook](#step-03-the-usequery-hook)
   - [Step 04: the useMutation Hook](#step-04-the-usemutation-hook)
   - [Step 05: the useSubscription Hook](#step-05-the-usesubscription-hook)
+  - [Step 05: local state managment with apollo client](#step-05-local-state-managment-with-apollo-client)
 
 <!-- /TOC -->
 
@@ -1309,5 +1310,30 @@ const [messages, setMessages] = useState([]);
 ```js
 useQuery(messagesQuery, {
   onCompleted: ({messages}) => setMessages(messages)
+});
+```
+
+### Step 05: local state managment with apollo client
+
+* https://www.apollographql.com/docs/react/v2/data/local-state/
+* This is a way to share data across components
+* `cache.writeData`
+* __Chat.js__
+```js
+const {data} = useQuery(messagesQuery);
+const messages = data ? data.messages : [];
+
+const [addMessage] = useMutation(addMessageMutation);
+
+const handleSend = async (text) => {    
+  await addMessage({variables: {input: {text}}});
+};
+
+useSubscription(messageAddedSubscription, {
+  onSubscriptionData: ({client, subscriptionData})=> {
+    client.cache.writeData({data: {
+      messages: messages.concat(subscriptionData.data.messageAdded)
+    }});
+  } 
 });
 ```
