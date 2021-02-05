@@ -49,6 +49,8 @@
   - [Step 04: the useMutation Hook](#step-04-the-usemutation-hook)
   - [Step 05: the useSubscription Hook](#step-05-the-usesubscription-hook)
   - [Step 05: local state managment with apollo client](#step-05-local-state-managment-with-apollo-client)
+  - [Step 06: writting custom hooks](#step-06-writting-custom-hooks)
+- [Migrating to Apollo Client 3.0](#migrating-to-apollo-client-30)
 
 <!-- /TOC -->
 
@@ -1337,3 +1339,100 @@ useSubscription(messageAddedSubscription, {
   } 
 });
 ```
+
+### Step 06: writting custom hooks
+* Hook is a function whose name starts with _use_
+* Create file `hooks.js`
+```js
+import { useQuery, useMutation, useSubscription } from '@apollo/react-hooks'
+import { messagesQuery, addMessageMutation, messageAddedSubscription } from './graphql/queries'
+
+export function useChatMessages() {
+  const {data} = useQuery(messagesQuery);
+  const messages = data ? data.messages : [];
+  const [addMessage] = useMutation(addMessageMutation);
+  useSubscription(messageAddedSubscription, {
+    onSubscriptionData: ({client, subscriptionData})=> {
+      client.cache.writeData({data: {
+        messages: messages.concat(subscriptionData.data.messageAdded)
+      }});
+    } 
+  });
+  return {
+    messages,
+    addMessage: (text) => addMessage({variables: {input: {text}}})
+  };
+}
+```
+* Use the hook function from the `chat.js`
+```js
+const Chat = ({user}) => {
+  const {messages, addMessage} = useChatMessages();
+  return (
+    <section className="section">
+      <div className="container">
+        <h1 className="title">Chatting as {user}</h1>
+        <MessageList user={user} messages={messages} />
+        <MessageInput onSend={addMessage} />
+      </div>
+    </section>
+  );
+};
+export default Chat;
+```
+
+## Migrating to Apollo Client 3.0
+On 14 July 2020 the Apollo team announced the release of [Apollo Client 3.0](https://www.apollographql.com/blog/announcing-the-release-of-apollo-client-3-0/).
+
+
+Thankfully, there are very few breaking changes compared to the previous version used in the course. All the concepts you learnt are still valid.
+
+In fact, there is basically just one major difference. As of Apollo Client 3.0, all the functionality is in a single npm package called @apollo/client.
+
+Need only the core client functionality, without any framework-specific integration? Install @apollo/client. Need WebSockets and subscriptions? That's already in @apollo/client, no need to install additional packages. React hooks? Yep, they're in @apollo/client as well.
+
+All the classes and functions we used in the course are still the same, they just need to be imported from the new package. Examples below.
+
+* __Core Apollo Client__
+
+In the Job Board application we installed apollo-boost and wrote this code:
+
+```js
+import { ApolloClient, ApolloLink, HttpLink, InMemoryCache } from 'apollo-boost';
+```
+
+To use Apollo Client 3.0 instead simply install @apollo/client instead of apollo-boost and change the import to be:
+
+```js
+import { ApolloClient, ApolloLink, HttpLink, InMemoryCache } from '@apollo/client/core';
+```
+
+* __WebSockets__
+
+In the Chat application we added support for WebSockets and subscription by installing an additional apollo-link-ws package and using the WebSocketLink class:
+```js
+import { WebSocketLink } from 'apollo-link-ws';
+````
+
+That class is now available in @apollo/client and can be imported as follows:
+
+import { WebSocketLink } from '@apollo/client/link/ws';
+React Hooks
+
+Instead of installing @apollo/react-hooks and importing:
+```js
+import { useQuery, useMutation, useSubscription } from '@apollo/react-hooks';
+```
+
+all the hooks are now in @apollo/client:
+```js
+import { useQuery, useMutation, useSubscription } from '@apollo/client';
+```
+* Full Details
+
+You can find the full details on what's changed in the new release in the Apollo documentation: [Migrating to Apollo Client 3.0](https://www.apollographql.com/docs/react/migrating/apollo-client-3-migration/).
+
+On Github I created a branch for each example with the code updated to Apollo Client 3.0:
+[Job Board](https://github.com/uptoskill/graphql-job-board/commit/9c73758e300f3e7e5aa3c1d6572c42d7110ecaf7)
+[Chat](https://github.com/uptoskill/graphql-chat/commit/93f32acabeb798e69868ddcd013f1ba6607063d7)
+
